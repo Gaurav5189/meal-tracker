@@ -1,4 +1,0 @@
-name = "meal-tracker-api"
-main = "app/main.py"
-compatibility_date = "2026-10-13"
-compatibility_flags = ["python_workers"]

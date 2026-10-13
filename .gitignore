@@ -1,0 +1,93 @@
+# ==============================================================================
+# Global / IDE Options
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.agents/
+
+# ==============================================================================
+# Backend (FastAPI / Python)
+# ==============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+target/
+
+# Package Management & Locks
+!.python-version
+.poetry/
+.pdm.toml
+.uv/
+
+# FastAPI / Python Apps specific
+*.log
+.pytest_cache/
+.htmlcov/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Database files
+*.db
+*.sqlite3
+
+# ==============================================================================
+# Frontend (React / Node / Vite or CRA)
+# ==============================================================================
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor / Tools
+.eslintcache
+.stylelintcache
+.prettiercache
+.parcel-cache
+.turbo/
+
+# ==============================================================================
+# Environment Variables and Secrets (CRITICAL)
+# ==============================================================================
+# Block all actual credential files but keep explicit template placeholders
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# EXCEPTIONS: Allow tracking of template examples if they exist
+!.env.example
+!.env.template
+
+# ==============================================================================
+# Containers & Deployment (Optional)
+# ==============================================================================
+.docker/

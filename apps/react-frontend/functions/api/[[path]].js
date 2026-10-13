@@ -5,9 +5,14 @@
 export async function onRequest(context) {
   const { request, env } = context;
 
-  // Azure API origin — configured in Cloudflare Pages environment variables.
-  // Default to the production Azure URL; override via API_ORIGIN in Pages.
-  const apiOrigin = env.API_ORIGIN || "https://meal-track.azurewebsites.net";
+  // Azure API origin is configured in Cloudflare Pages environment variables.
+  const apiOrigin = env.API_ORIGIN;
+  if (!apiOrigin) {
+    return new Response(
+      JSON.stringify({ error: { code: "proxy_config_error", message: "API_ORIGIN is not configured." } }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
+  }
 
   const url = new URL(request.url);
   // Preserve the full path and query string

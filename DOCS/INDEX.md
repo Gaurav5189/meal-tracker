@@ -1,8 +1,8 @@
 # Project Index & Map
 
 ## Active State
-- **Current Phase:** Phase 0 — Setup (in progress)
-- **Current Task:** Scaffold `apps/react-frontend` (Vite + React + TS) and `apps/meal-tracker-api` (FastAPI + uv), tokens.css, Alembic, CI
+- **Current Phase:** Phase 0 — Setup (in progress; Neon migration check pending)
+- **Current Task:** Verify Alembic against Neon once `apps/meal-tracker-api/.env` has `DATABASE_URL`, then Phase 1
 
 ## Structure
 - `apps/react-frontend/` — Vite + React + TypeScript frontend

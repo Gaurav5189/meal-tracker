@@ -1,0 +1,155 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Meal Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+:root{--p:#790D16;--s:#E5D3AF;--bg:#F5EFE1;--a:#AEC4D4;--card:#fff;--tx:#2b1a1c;--mu:#7d6c6e;--ln:#e5d3af;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--p:#b3303c;--s:#3a2a22;--bg:#1a1213;--card:#271a1c;--tx:#f5efe1;--mu:#b9a89f;--ln:#3d2c2d}}
+:root[data-theme=dark]{--p:#b3303c;--s:#3a2a22;--bg:#1a1213;--card:#271a1c;--tx:#f5efe1;--mu:#b9a89f;--ln:#3d2c2d}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 "Nunito","Segoe UI",system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--a);outline-offset:2px}[hidden]{display:none!important}
+h1,h2{font-family:"Fraunces",Georgia,serif;margin:0;font-weight:700}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:20px;padding:20px}
+.auth .card{width:100%;max-width:380px}.auth h1{font-size:30px;color:var(--p);margin-bottom:4px}.mu{color:var(--mu);font-size:14px}
+.tabs,.seg{display:flex;background:var(--bg);border-radius:12px;padding:4px}.tabs{margin:18px 0}.seg{margin:10px 0}
+.tabs button,.seg button{flex:1;padding:10px 6px;border-radius:9px;font-weight:700;color:var(--mu)}
+.tabs .on,.seg .on{background:var(--p);color:#fff}
+label{display:block;font-weight:700;font-size:14px;margin:12px 0 6px}
+input[type=text],input[type=password],input[type=number],input[type=date],select{width:100%;padding:12px 14px;border:2px solid var(--ln);border-radius:12px;background:var(--bg)}
+input:disabled,input:read-only{opacity:.6}
+.btn{width:100%;margin-top:18px;padding:13px;border-radius:12px;background:var(--p);color:#fff;font-weight:800;transition:transform .1s}.btn:active{transform:scale(.98)}
+.lrow{display:flex;align-items:center;gap:8px;position:relative}.lrow label{margin:12px 0 6px}
+.warn{margin-top:6px;width:28px;height:28px;border-radius:50%;background:var(--s);color:var(--p);font-weight:800;line-height:1}
+.pop{position:absolute;right:0;top:44px;z-index:5;background:var(--tx);color:var(--bg);padding:10px 12px;border-radius:12px;font-size:13px;width:240px;box-shadow:0 6px 20px #0004}
+#app{display:flex;min-height:100vh}
+aside{position:fixed;top:0;bottom:0;left:0;width:260px;z-index:20;background:var(--p);color:#F5EFE1;padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .25s}
+aside.open{transform:none}aside h2{font-size:22px;padding:8px 8px 18px;border-bottom:1px solid #ffffff33;margin-bottom:10px}
+aside button{display:block;width:100%;text-align:left;padding:13px 12px;border-radius:12px;font-weight:700;color:#F5EFE1}
+aside button.on{background:#ffffff26}.sp{flex:1}aside .out{border-top:1px solid #ffffff33;border-radius:0;padding-top:16px}
+#ov{position:fixed;inset:0;background:#0006;z-index:15;opacity:0;pointer-events:none;transition:.25s}#ov.show{opacity:1;pointer-events:auto}
+main{flex:1;width:100%;max-width:560px;margin:0 auto;padding:0 16px 40px}
+.top{display:flex;align-items:center;gap:12px;padding:14px 0}.top h2{font-size:20px}
+.burger{width:42px;height:42px;border-radius:12px;background:var(--card);border:1px solid var(--ln);font-size:20px}
+.sum{background:var(--p);color:#F5EFE1;border-radius:22px;padding:18px;margin-bottom:12px}
+.mon{display:flex;justify-content:space-between;align-items:center}
+.mon button{width:38px;height:38px;border-radius:50%;background:#ffffff26;color:#fff;font-size:18px}.mon b{font:700 18px "Fraunces",Georgia,serif}
+.tot{display:flex;gap:10px;margin-top:14px}.tot div{flex:1;background:#ffffff1f;border-radius:14px;padding:10px 12px}
+.tot small{display:block;opacity:.8;font-size:12px}.tot strong{font-size:24px}
+.bulk{padding:6px 14px;margin-bottom:16px;border-radius:18px}.bt{width:100%;display:flex;justify-content:space-between;padding:10px 0;font-weight:800;color:var(--p)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pre{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.pre button{padding:7px 12px;border-radius:20px;background:var(--s);font-size:13px;font-weight:700}
+.bulk .btn{margin:8px 0 10px}
+.head,.row{display:grid;grid-template-columns:76px 1fr 1fr;gap:8px;align-items:center}
+.head{padding:0 4px 6px;color:var(--mu);font-size:13px;font-weight:700}
+.row{padding:8px;border-radius:16px;margin-bottom:6px;background:var(--card);border:1px solid var(--ln)}.row.today{border:2px solid var(--p)}
+.d b{display:block;font-size:14px}.d span{font-size:12px;color:var(--mu)}
+.chip{padding:11px 6px;border-radius:12px;border:2px dashed var(--ln);color:var(--mu);font-weight:700;font-size:14px;transition:.15s}
+.chip.t{background:var(--a);border:2px solid var(--a);color:#14232e}.chip.o{box-shadow:inset 0 0 0 2px var(--p)}
+.chip.lk{opacity:.5;cursor:not-allowed}.chip small{display:block;font-weight:600;opacity:.75;font-size:11px}
+.sheet{position:fixed;inset:0;z-index:30;display:flex;align-items:flex-end;justify-content:center;background:#0006}
+.sheet .card{width:100%;max-width:420px;border-radius:24px 24px 0 0;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));animation:up .22s}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media(min-width:600px){.sheet{align-items:center}.sheet .card{border-radius:24px}}
+.seg .c.on{background:var(--p);color:#fff}.seg .u.on{background:var(--a);color:#14232e}
+.cost{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700}
+.cost button{padding:8px 12px;border-radius:10px;background:var(--bg);font-weight:800}.cost input{width:90px;padding:8px 10px}
+.tog{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px}.tog label{margin:0}
+.sw{position:relative;width:50px;height:30px;flex:none;appearance:none;border-radius:20px;background:var(--ln);transition:.2s}
+.sw:checked{background:var(--p)}.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}.sw:checked::after{transform:translateX(20px)}
+.gap{margin-top:12px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,90px);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:20px;font-weight:700;transition:.25s;z-index:40;white-space:nowrap}
+#toast.show{transform:translate(-50%,0)}
+@media(min-width:900px){aside{transform:none}#ov{display:none}.burger{display:none}main{margin-left:calc(260px + (100% - 260px - 560px)/2);margin-right:auto}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body>
+<div class="auth" id="auth"><div class="card"><h1>Meal Tracker</h1><div class="mu">Track lunches and dinners. Know what you owe.</div>
+<div class="tabs"><button class="on" data-m="in">Log in</button><button data-m="up">Sign up</button></div>
+<div id="nmw" hidden><label for="nm">Name</label><input type="text" id="nm" value="Carl" autocomplete="name"></div>
+<label for="u">Username</label><input type="text" id="u" value="carl" autocomplete="username">
+<div class="lrow"><label for="pw">Password</label><button class="warn" id="wn" hidden aria-label="Password warning" aria-expanded="false">!</button><div class="pop" id="pp" role="tooltip" hidden>Save your password. There is no reset or recovery method.</div></div>
+<input type="password" id="pw" value="secret123" autocomplete="current-password">
+<button class="btn" id="go">Log in</button></div></div>
+
+<div id="app" hidden>
+<aside id="sb"><h2 id="hi">Hello Carl</h2><button data-v="tracker" class="on">Meals</button><button data-v="profile">Profile</button><button data-v="settings">Settings</button><div class="sp"></div><button class="out" id="lo">Log out</button></aside><div id="ov"></div>
+<main><div class="top"><button class="burger" id="bg" aria-label="Menu">☰</button><h2 id="ttl">Meals</h2></div>
+<section id="v-tracker"><div class="sum"><div class="mon"><button id="pv" aria-label="Previous month">‹</button><b id="mn"></b><button id="nx" aria-label="Next month">›</button></div>
+<div class="tot"><div><small>Meal price total</small><strong id="tp"></strong></div><div><small>Meals taken</small><strong id="tc"></strong></div></div></div>
+<div class="card bulk"><button class="bt" id="bk" aria-expanded="false"><span>Bulk actions</span><span id="bkc">▾</span></button>
+<div id="bp" hidden><div class="seg" id="bm"><button data-v="L">Lunch</button><button data-v="D">Dinner</button><button data-v="B" class="on">Both</button></div>
+<div class="g2"><div><label for="bf">From</label><input type="date" id="bf"></div><div><label for="bto">To</label><input type="date" id="bto"></div></div>
+<div class="pre"><button data-p="rest">Rest of month</button><button data-p="week">This week</button><button data-p="all">Whole month</button></div>
+<div class="seg" id="ba"><button data-v="1" class="on">Mark taken</button><button data-v="0">Mark skipped</button></div>
+<button class="btn" id="ap">Apply</button></div></div>
+<div class="head"><span>Date</span><span>Lunch</span><span>Dinner</span></div><div id="rows"></div></section>
+<section id="v-profile" hidden><div class="card"><h2>Account</h2><label for="pn">Name</label><input type="text" id="pn"><label for="pu">Username</label><input type="text" id="pu" readonly><button class="btn" id="sn">Save name</button></div>
+<div class="card gap"><h2>Reset password</h2><label for="p1">Current password</label><input type="password" id="p1"><label for="p2">New password</label><input type="password" id="p2"><label for="p3">Confirm new password</label><input type="password" id="p3"><button class="btn" data-t="Password updated">Update password</button></div></section>
+<section id="v-settings" hidden><div class="card"><h2>Meal cost</h2><label for="sc">Currency</label><select id="sc"><option>INR</option><option>USD</option><option>EUR</option><option>GBP</option><option>BDT</option><option>AED</option></select>
+<label for="sl">Lunch</label><input type="number" id="sl" min="0"><label for="sd">Dinner</label><input type="number" id="sd" min="0">
+<div class="tog"><label for="ss">Dinner same as lunch</label><input type="checkbox" class="sw" id="ss"></div></div>
+<div class="card gap"><h2>Upcoming meals</h2><div class="tog"><label for="sf">Mark as taken by default<div class="mu" style="font-weight:400">Today and past meals are not changed.</div></label><input type="checkbox" class="sw" id="sf"></div></div>
+<div class="card gap"><h2>Past meals</h2><div class="tog"><label for="sk">Lock past meals<div class="mu" style="font-weight:400">Meals older than 48 hours become read-only.</div></label><input type="checkbox" class="sw" id="sk"></div></div>
+<button class="btn" id="sv">Save settings</button></section></main></div>
+<div class="sheet" id="sheet" hidden></div><div id="toast" role="status"></div>
+<script>
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,"0"),iso=x=>`${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}`;
+const now=new Date(),TD=iso(now),CUT=iso(new Date(+now-48*36e5));
+let cur=new Date(now.getFullYear(),now.getMonth(),1),S={l:35,d:35,same:true,fut:true,cur:"INR",lock:true},M={},U={name:"Carl",user:"carl"},mode="in",B={t:"B",a:1};
+const fmt=d=>{const[y,m,x]=d.split("-");return`${x}/${m}/${y.slice(2)}`};
+const mf=c=>new Intl.NumberFormat("en",{style:"currency",currency:S.cur,minimumFractionDigits:0,maximumFractionDigits:2}).format(c);
+const lk=d=>S.lock&&d<CUT;
+function get(d,t){const k=d+"|"+t;if(!M[k]){const h=(d.charCodeAt(9)+t.charCodeAt(0)*3)%5;M[k]={t:d<TD?h!=0:S.fut,p:t=="L"?S.l:S.same?S.l:S.d,o:false,m:false}}return M[k]}
+function toast(m){const e=$("#toast");e.textContent=m;e.classList.add("show");clearTimeout(toast.i);toast.i=setTimeout(()=>e.classList.remove("show"),2200)}
+function render(){const y=cur.getFullYear(),m=cur.getMonth(),n=new Date(y,m+1,0).getDate();
+$("#mn").textContent=cur.toLocaleString("en",{month:"long",year:"numeric"});let h="",tp=0,tc=0;
+for(let i=1;i<=n;i++){const d=`${y}-${pad(m+1)}-${pad(i)}`,wd=new Date(y,m,i).toLocaleString("en",{weekday:"short"}),L=lk(d);
+h+=`<div class="row${d==TD?" today":""}"><div class="d"><b>${d==TD?"Today":wd}</b><span>${fmt(d)}</span></div>`;
+for(const t of["L","D"]){const x=get(d,t);if(x.t){tp+=x.p;tc++}
+h+=`<button class="chip${x.t?" t":""}${x.o?" o":""}${L?" lk":""}" data-d="${d}" data-t="${t}"${L?' aria-disabled="true"':""}>${x.t?"✓ Taken":"Skipped"}<small>${L?"🔒 ":""}${mf(x.p)}</small></button>`}h+="</div>"}
+$("#rows").innerHTML=h;$("#tp").textContent=mf(tp);$("#tc").textContent=tc}
+function sheet(d,t,edit){const x=get(d,t),s=$("#sheet");s.hidden=false;
+s.innerHTML=`<div class="card" role="dialog" aria-modal="true"><h2>${t=="L"?"Lunch":"Dinner"} · ${fmt(d)}</h2>
+<div class="seg"><button class="c${x.t?" on":""}" data-a="1">Check</button><button class="u${x.t?"":" on"}" data-a="0">Uncheck</button></div>
+<div class="cost">${edit?`<span>Meal cost</span><input type="number" id="ep" min="0" value="${x.p}"><button data-a="save">Save</button>`:`<span>Meal cost: ${mf(x.p)}${x.o?" (custom)":""}</span><button data-a="edit" aria-label="Edit price">✎ Edit</button>`}</div></div>`;
+s.onclick=e=>{const a=e.target.dataset.a;if(e.target==s){s.hidden=true;return}if(a==null)return;
+if(a=="edit")return sheet(d,t,true);
+if(a=="save"){const v=+$("#ep").value;if(v>=0){x.p=v;x.o=true}render();return sheet(d,t)}
+x.t=a=="1";x.m=true;render();sheet(d,t)}}
+$("#rows").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;if(lk(b.dataset.d))return toast("Locked: older than 48 hours");sheet(b.dataset.d,b.dataset.t)};
+const mv=n=>{cur.setMonth(cur.getMonth()+n);render();preset("rest")};$("#pv").onclick=()=>mv(-1);$("#nx").onclick=()=>mv(1);
+document.addEventListener("keydown",e=>{if(e.key=="Escape"){$("#sheet").hidden=true;$("#pp").hidden=true}});
+function preset(p){const y=cur.getFullYear(),m=cur.getMonth(),a=new Date(y,m,1),z=new Date(y,m+1,0),td=new Date(now.getFullYear(),now.getMonth(),now.getDate());let f=a,t=z;
+if(p=="rest")f=td>a&&td<=z?td:a;
+if(p=="week"){f=new Date(td);f.setDate(td.getDate()-(td.getDay()+6)%7);t=new Date(f);t.setDate(f.getDate()+6)}
+$("#bf").value=iso(f);$("#bto").value=iso(t)}
+function seg(id,k){$(id).onclick=e=>{const b=e.target.closest("button");if(!b)return;[...$(id).children].forEach(x=>x.classList.toggle("on",x==b));B[k]=b.dataset.v}}
+seg("#bm","t");seg("#ba","a");
+document.querySelectorAll(".pre button").forEach(b=>b.onclick=()=>preset(b.dataset.p));
+$("#bk").onclick=()=>{const o=$("#bp").hidden;$("#bp").hidden=!o;$("#bk").setAttribute("aria-expanded",o);$("#bkc").textContent=o?"▴":"▾"};
+$("#ap").onclick=()=>{const f=$("#bf").value,z=$("#bto").value;if(!f||!z||f>z)return toast("Choose a valid date range");
+const ts=B.t=="B"?["L","D"]:[B.t];let u=0,k=0;
+for(const dt=new Date(f+"T00:00");iso(dt)<=z;dt.setDate(dt.getDate()+1)){const d=iso(dt);for(const t of ts){if(lk(d)){k++;continue}const x=get(d,t);x.t=B.a=="1";x.m=true;u++}}
+render();toast(`Updated ${u} meals${k?`, ${k} locked skipped`:""}`)};
+function nav(v){["tracker","profile","settings"].forEach(k=>$("#v-"+k).hidden=k!=v);
+document.querySelectorAll("#sb [data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v==v));
+$("#ttl").textContent={tracker:"Meals",profile:"Profile",settings:"Settings"}[v];shut()}
+const shut=()=>{$("#sb").classList.remove("open");$("#ov").classList.remove("show")};
+$("#bg").onclick=()=>{$("#sb").classList.add("open");$("#ov").classList.add("show")};$("#ov").onclick=shut;
+document.querySelectorAll("#sb [data-v]").forEach(b=>b.onclick=()=>nav(b.dataset.v));
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));
+const up=mode=="up";$("#nmw").hidden=!up;$("#wn").hidden=!up;$("#pp").hidden=true;$("#go").textContent=up?"Create account":"Log in"});
+$("#wn").onclick=e=>{e.stopPropagation();const h=$("#pp").hidden;$("#pp").hidden=!h;$("#wn").setAttribute("aria-expanded",h)};
+document.addEventListener("click",e=>{if(!e.target.closest("#pp"))$("#pp").hidden=true});
+function who(){$("#hi").textContent="Hello "+U.name;$("#pn").value=U.name;$("#pu").value=U.user}
+$("#go").onclick=()=>{U.user=($("#u").value.trim().toLowerCase())||"carl";U.name=mode=="up"?($("#nm").value.trim()||U.user):U.name;who();$("#auth").hidden=true;$("#app").hidden=false;render();preset("rest")};
+$("#lo").onclick=()=>{$("#app").hidden=true;$("#auth").hidden=false;nav("tracker")};
+$("#sn").onclick=()=>{const v=$("#pn").value.trim();if(!v)return toast("Name can't be empty");U.name=v;who();toast("Name saved")};
+function sync(){$("#sd").disabled=$("#ss").checked;if($("#ss").checked)$("#sd").value=$("#sl").value}
+$("#sl").oninput=sync;$("#ss").onchange=sync;
+function load(){$("#sc").value=S.cur;$("#sl").value=S.l;$("#sd").value=S.d;$("#ss").checked=S.same;$("#sf").checked=S.fut;$("#sk").checked=S.lock;sync()}
+$("#sv").onclick=()=>{S={l:+$("#sl").value,d:+$("#sd").value,same:$("#ss").checked,fut:$("#sf").checked,cur:$("#sc").value,lock:$("#sk").checked};
+for(const k in M){const[d,t]=k.split("|"),x=M[k];if(d>TD){if(!x.o)x.p=t=="L"?S.l:S.same?S.l:S.d;if(!x.m)x.t=S.fut}}render();toast("Settings saved")};
+document.querySelectorAll("[data-t].btn").forEach(b=>b.onclick=()=>toast(b.dataset.t));
+load();
+</script></body></html>

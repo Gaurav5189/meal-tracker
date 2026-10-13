@@ -2,7 +2,7 @@
 
 Rule: finish a phase (all "Done when" items) and update `MEMORY.md` before starting the next.
 
-## Phase 0 — Setup
+## Phase 0 — Setup  (completed)
 - Monorepo folders under `apps/` (react-frontend, meal-tracker-api), Vite + TS + plain CSS tokens, FastAPI skeleton (uv), Neon project, Alembic init, env files, lint/format, CI (lint + tests).
 - Tokens from `DESIGN.md` in `tokens.css`; fonts self-hosted.
 - Done when: both apps run locally, `/health` returns 200, migrations run on Neon.

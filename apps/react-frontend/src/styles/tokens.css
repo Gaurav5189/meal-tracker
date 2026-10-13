@@ -1,0 +1,67 @@
+/* Design tokens — source of truth: DOCS/DESIGN.md. No Tailwind. */
+:root {
+  color-scheme: light dark;
+
+  /* Color — light (default) */
+  --p: #790d16; /* primary */
+  --s: #e5d3af; /* secondary surfaces */
+  --bg: #f5efe1; /* page background */
+  --card: #ffffff; /* cards, rows, sheets */
+  --a: #aec4d4; /* accent: taken chips, focus ring */
+  --tx: #2b1a1c; /* text */
+  --mu: #7d6c6e; /* muted text */
+  --ln: #e5d3af; /* borders */
+  --on-a: #14232e; /* text on accent */
+  --on-p: #f5efe1; /* text on primary */
+  --danger: #b3261e; /* errors */
+
+  /* Shape */
+  --radius-sheet: 24px;
+  --radius-card: 20px;
+  --radius-row: 16px;
+  --radius-chip: 12px;
+  --radius-input: 12px;
+
+  /* Spacing scale */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+
+  /* Typography */
+  --font-heading: "Fraunces Variable", Georgia, serif;
+  --font-body: "Nunito Variable", "Segoe UI", system-ui, sans-serif;
+
+  /* Motion */
+  --dur-sheet: 220ms;
+  --dur-drawer: 250ms;
+  --dur-chip: 150ms;
+}
+
+/* Color — dark (auto) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --p: #b3303c;
+    --s: #3a2a22;
+    --bg: #1a1213;
+    --card: #271a1c;
+    --tx: #f5efe1;
+    --mu: #b9a89f;
+    --ln: #3d2c2d;
+    --danger: #f2766e;
+  }
+}
+
+/* Color — dark (manual override, for later) */
+:root[data-theme="dark"] {
+  --p: #b3303c;
+  --s: #3a2a22;
+  --bg: #1a1213;
+  --card: #271a1c;
+  --tx: #f5efe1;
+  --mu: #b9a89f;
+  --ln: #3d2c2d;
+  --danger: #f2766e;
+}

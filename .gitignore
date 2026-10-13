@@ -66,6 +66,8 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Editor / Tools
+.pnpm-store/
+.playwright-mcp/
 .eslintcache
 .stylelintcache
 .prettiercache

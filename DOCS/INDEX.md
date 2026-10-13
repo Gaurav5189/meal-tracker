@@ -1,8 +1,8 @@
 # Project Index & Map
 
 ## Active State
-- **Current Phase:** Phase 6 — Bulk Actions (completed)
-- **Current Task:** Ready to start Phase 7 — Polish & Performance
+- **Current Phase:** Phase 8 — Hardening & Release (in progress)
+- **Current Task:** Security headers + access logging landed; final production smoke test and Azure redeploy pending
 
 ## Structure
 - `apps/react-frontend/` — Vite + React + TypeScript frontend

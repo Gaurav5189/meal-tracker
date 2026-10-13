@@ -113,8 +113,10 @@ Load → GET /me
 ```
 - Server state: TanStack Query (`['meals', month]`, `['settings']`, `['me']`). Chip toggles use optimistic update with rollback on error.
 - Changing settings invalidates `['meals']`.
-- Route-level code splitting; prefetch the adjacent month.
+- Route-level code splitting; prefetch the adjacent month (prev/next warmed after the current month settles).
+- Skeleton loaders (month card, table, shell, settings) and an empty-state card; `prefers-reduced-motion` respected globally and for scroll behavior.
+- Dialogs (MealSheet, OnboardingModal) share `lib/useModalFocus` for focus trap + restore; the mobile drawer moves focus in/out and closes on Escape.
 - "Today" and month boundaries computed from `users.tz`; money formatted via `Intl.NumberFormat(locale, {style:'currency', currency})`.
 
 ## 8. Deployment
-Frontend: static host (Vercel/Netlify/Cloudflare Pages). Backend: container host (Fly/Render/Railway). Env vars: `DATABASE_URL`, `JWT_SECRET` (>= 32 chars, must not be repo default `dev-only-change-me` when DEBUG=false), `CORS_ORIGINS`, `COOKIE_DOMAIN`, `DEBUG` (false in production). Migrations run with Alembic on deploy.
+Frontend: Cloudflare Pages (static build + `functions/api/[[path]].js` proxy to the API via `API_ORIGIN`; `_headers`/`_redirects` for security headers and SPA fallback). Backend: Azure App Service (`.github/workflows/main_meal-track.yml` on push to `main`). The API sets baseline security headers and emits access logs via `app/core/middleware.py`. Env vars: `DATABASE_URL`, `JWT_SECRET` (>= 32 chars, must not be repo default `dev-only-change-me` when DEBUG=false), `CORS_ORIGINS`, `COOKIE_DOMAIN`, `COOKIE_SECURE`, `DEBUG` (false in production). Migrations run with Alembic on deploy.

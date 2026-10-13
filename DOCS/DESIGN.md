@@ -13,7 +13,7 @@ Brand: `#790D16` burgundy · `#E5D3AF` sand · `#F5EFE1` cream · `#AEC4D4` mist
 | `--card` | `#FFFFFF` | `#271A1C` | Cards, rows, sheets |
 | `--a` | `#AEC4D4` | `#AEC4D4` | "Taken" chips, Uncheck state, focus ring |
 | `--tx` | `#2B1A1C` | `#F5EFE1` | Text |
-| `--mu` | `#7D6C6E` | `#B9A89F` | Muted text |
+| `--mu` | `#6F5F61` | `#B9A89F` | Muted text |
 | `--ln` | `#E5D3AF` | `#3D2C2D` | Borders, skipped chip outline |
 | on-accent | `#14232E` | `#14232E` | Text on `--a` |
 | on-primary | `#F5EFE1` | `#F5EFE1` | Text on `--p` |

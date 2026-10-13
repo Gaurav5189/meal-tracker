@@ -37,13 +37,13 @@ Rule: finish a phase (all "Done when" items) and update `MEMORY.md` before start
 - `POST /meals/bulk`; BulkActions block under the month card with presets and result message.
 - Done when: range/meal-type/action work; locked meals are skipped and counted; single transaction.
 
-## Phase 7 — Polish & Performance
+## Phase 7 — Polish & Performance  (completed)
 - PWA (manifest, icons, offline shell), prefetch adjacent month, skeleton loaders, empty states, a11y pass, reduced motion, dark mode QA, Lighthouse ≥ 90.
-- Done when: audits meet targets on a throttled mobile profile.
+- Done when: audits meet targets on a throttled mobile profile. ✅ Performance 98 / Accessibility 100 / Best Practices 96 / SEO 100.
 
-## Phase 8 — Hardening & Release
+## Phase 8 — Hardening & Release  (in progress)
 - Security checklist, CORS/cookie config for production, backups, monitoring/logging, README with setup and env vars, deploy both apps.
-- Done when: production smoke test passes end to end.
+- Done when: production smoke test passes end to end. Deployed on Cloudflare Pages (app) + Azure (API).
 
 ## Future (not in v1)
 CSV export, optional email recovery, per-meal notes, charts, more meal types, shared households.

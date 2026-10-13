@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.errors import register_error_handlers
+from app.core.middleware import access_log_and_headers
 from app.routers import auth, me, meals
 from app.routers import settings as settings_router
 
@@ -17,6 +18,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.middleware("http")(access_log_and_headers)
 
     register_error_handlers(app)
 

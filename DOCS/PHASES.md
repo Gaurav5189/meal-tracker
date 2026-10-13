@@ -7,7 +7,7 @@ Rule: finish a phase (all "Done when" items) and update `MEMORY.md` before start
 - Tokens from `DESIGN.md` in `tokens.css`; fonts self-hosted.
 - Done when: both apps run locally, `/health` returns 200, migrations run on Neon.
 
-## Phase 1 — Login & Sign up
+## Phase 1 — Login & Sign up  (completed)
 - Migration: `users`, `settings`.
 - Endpoints: signup, login, logout, `/me`. Argon2id, JWT cookie, CSRF, rate limit, validation.
 - UI: AuthPage with tabs, name/username/password fields, password warning icon + popover, error states, timezone capture.

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { NavLink, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 
+import Skeleton from "../components/Skeleton";
 import ui from "../components/ui.module.css";
 import { ApiError } from "../lib/api";
 import { fetchMe, logout, meQueryKey } from "../features/auth/api";
@@ -26,6 +27,7 @@ export default function AppShell() {
   const location = useLocation();
   const queryClient = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const sidebarRef = useRef<HTMLElement | null>(null);
 
   const meQuery = useQuery({ queryKey: meQueryKey, queryFn: fetchMe, retry: false });
 
@@ -38,6 +40,14 @@ export default function AppShell() {
     return () => document.removeEventListener("keydown", onKey);
   }, [drawerOpen]);
 
+  // Move focus into the drawer when it opens and back to the burger on close.
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    sidebarRef.current?.querySelector<HTMLElement>("a[href], button")?.focus();
+    return () => trigger?.focus();
+  }, [drawerOpen]);
+
   const logoutMutation = useMutation({
     mutationFn: logout,
     onSuccess: () => {
@@ -48,8 +58,14 @@ export default function AppShell() {
 
   if (meQuery.isPending) {
     return (
-      <div className={ui.screen}>
-        <p className={`${ui.muted} ${styles.loading}`}>Loading…</p>
+      <div className={ui.screen} aria-busy="true">
+        <div className={ui.card}>
+          <Skeleton width="140px" height="22px" />
+          <div className={ui.skelStack}>
+            <Skeleton height="44px" />
+            <Skeleton height="44px" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -77,7 +93,7 @@ export default function AppShell() {
   return (
     <div className={styles.app}>
       {!me.onboarded && <OnboardingModal me={me} />}
-      <aside className={`${styles.sidebar} ${drawerOpen ? styles.open : ""}`}>
+      <aside ref={sidebarRef} className={`${styles.sidebar} ${drawerOpen ? styles.open : ""}`}>
         <h2 className={styles.sideTitle}>Hello {me.name}</h2>
         <nav aria-label="Main">
           {NAV_ITEMS.map((item) => (

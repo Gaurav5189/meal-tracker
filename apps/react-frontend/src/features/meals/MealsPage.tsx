@@ -18,7 +18,8 @@ import BulkActions from "./BulkActions";
 import MealSheet from "./MealSheet";
 import MealTable from "./MealTable";
 import MonthCard from "./MonthCard";
-import { currentMonth, todayIso } from "./format";
+import Skeleton from "../../components/Skeleton";
+import { currentMonth, shiftMonth, todayIso } from "./format";
 import styles from "./meals.module.css";
 import ui from "../../components/ui.module.css";
 
@@ -69,6 +70,21 @@ export default function MealsPage() {
   const [sheet, setSheet] = useState<{ date: string; mealType: MealType } | null>(null);
 
   const mealsQuery = useQuery({ queryKey: mealsQueryKey(month), queryFn: () => fetchMeals(month) });
+
+  // Warm the prev/next months once the current one settles, so the nav buttons
+  // render instantly (staleTime still applies). prefetchQuery never rejects: a
+  // month past the horizon just caches its error, which the branch below then
+  // shows exactly like a direct navigation would.
+  useEffect(() => {
+    if (mealsQuery.isPending || mealsQuery.isError) return;
+    for (const delta of [-1, 1]) {
+      const adjacent = shiftMonth(month, delta);
+      void queryClient.prefetchQuery({
+        queryKey: mealsQueryKey(adjacent),
+        queryFn: () => fetchMeals(adjacent),
+      });
+    }
+  }, [month, mealsQuery.isPending, mealsQuery.isError, queryClient]);
 
   const patchMutation = useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: MealPatch }) => patchMeal(id, patch),
@@ -175,8 +191,29 @@ export default function MealsPage() {
 
   if (mealsQuery.isPending) {
     return (
-      <div className={ui.card}>
-        <p className={ui.muted}>Loading…</p>
+      <div aria-busy="true" aria-live="polite">
+        <div className={styles.sum}>
+          <div className={styles.mon}>
+            <Skeleton width="38px" height="38px" tone="primary" />
+            <Skeleton width="140px" height="24px" tone="primary" />
+            <Skeleton width="38px" height="38px" tone="primary" />
+          </div>
+          <div className={styles.tot}>
+            <div>
+              <Skeleton width="92px" height="13px" tone="primary" />
+              <Skeleton width="64px" height="26px" tone="primary" />
+            </div>
+            <div>
+              <Skeleton width="92px" height="13px" tone="primary" />
+              <Skeleton width="44px" height="26px" tone="primary" />
+            </div>
+          </div>
+        </div>
+        <div className={ui.skelStack}>
+          {Array.from({ length: 5 }, (_, i) => (
+            <Skeleton key={i} height="56px" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -250,13 +287,19 @@ export default function MealsPage() {
         onMonthChange={setMonth}
       />
       <BulkActions month={month} today={data.today || todayIso()} />
-      <MealTable
-        days={data.days}
-        today={data.today}
-        currency={data.currency}
-        onChipClick={openSheet}
-        todayRowRef={setTodayRow}
-      />
+      {data.days.length === 0 ? (
+        <div className={ui.card}>
+          <p className={ui.muted}>No meals to show for this month.</p>
+        </div>
+      ) : (
+        <MealTable
+          days={data.days}
+          today={data.today}
+          currency={data.currency}
+          onChipClick={openSheet}
+          todayRowRef={setTodayRow}
+        />
+      )}
       {showGoToday && (
         <button type="button" className={styles.goToday} onClick={goToToday}>
           Go to today <span aria-hidden="true">{todayAbove ? "↑" : "↓"}</span>

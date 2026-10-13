@@ -56,6 +56,11 @@
   font-size: 24px;
 }
 
+/* Skeleton blocks stacked inside the loading month card. */
+.tot span + span {
+  margin-top: 6px;
+}
+
 /* Bulk actions block */
 .bulk {
   padding: 6px 14px;
@@ -80,6 +85,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+.g2 > * {
+  /* Native date inputs have a wide intrinsic size; without this the "To"
+     field's min-content width overflows the card on narrow screens. */
+  min-width: 0;
 }
 
 .pre {

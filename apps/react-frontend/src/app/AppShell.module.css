@@ -101,10 +101,6 @@
   font-size: 20px;
 }
 
-.loading {
-  color: var(--mu);
-}
-
 @media (min-width: 900px) {
   .sidebar {
     transform: none;

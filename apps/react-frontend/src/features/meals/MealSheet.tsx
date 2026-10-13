@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { Meal, MealType } from "./api";
 import { formatDayDate, formatMoney } from "./format";
+import { useModalFocus } from "../../lib/useModalFocus";
 import styles from "./meals.module.css";
 
 interface MealSheetProps {
@@ -29,6 +30,7 @@ export default function MealSheet({
   const [editing, setEditing] = useState(false);
   const [priceInput, setPriceInput] = useState(String(Number(meal.price)));
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useModalFocus<HTMLDivElement>();
 
   useEffect(() => {
     if (editing) inputRef.current?.focus();
@@ -58,8 +60,15 @@ export default function MealSheet({
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className={styles.sheetCard} role="dialog" aria-modal="true">
-        <h2 className={styles.sheetTitle}>
+      <div
+        ref={dialogRef}
+        className={styles.sheetCard}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="meal-sheet-title"
+        tabIndex={-1}
+      >
+        <h2 className={styles.sheetTitle} id="meal-sheet-title">
           {mealType === "lunch" ? "Lunch" : "Dinner"} · {formatDayDate(date)}
         </h2>
         <div className={styles.seg}>

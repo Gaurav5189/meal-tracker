@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import ui from "../../components/ui.module.css";
 import { meQueryKey, updateMe, type Me } from "../auth/api";
 import SettingsForm from "../settings/SettingsForm";
+import { useModalFocus } from "../../lib/useModalFocus";
 import styles from "./OnboardingModal.module.css";
 
 interface OnboardingModalProps {
@@ -18,6 +19,7 @@ interface OnboardingModalProps {
  */
 export default function OnboardingModal({ me }: OnboardingModalProps) {
   const queryClient = useQueryClient();
+  const dialogRef = useModalFocus<HTMLDivElement>();
 
   // Freeze the page behind the dialog while it's open.
   useEffect(() => {
@@ -36,10 +38,12 @@ export default function OnboardingModal({ me }: OnboardingModalProps) {
   return (
     <div className={styles.overlay}>
       <div
+        ref={dialogRef}
         className={`${ui.card} ${styles.dialog}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="onboarding-title"
+        tabIndex={-1}
       >
         <h2 className={ui.cardTitle} id="onboarding-title">
           Welcome, {me.name}!

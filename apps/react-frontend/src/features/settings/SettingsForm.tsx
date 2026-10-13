@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import ui from "../../components/ui.module.css";
+import Skeleton from "../../components/Skeleton";
 import { Switch } from "../../components/Switch";
 import { useToast } from "../../components/ToastContext";
 import { ApiError } from "../../lib/api";
@@ -109,8 +110,13 @@ export default function SettingsForm({ submitLabel, successMessage, onSaved }: S
 
   if (settingsQuery.isPending) {
     return (
-      <div className={ui.card}>
-        <p className={ui.muted}>Loading…</p>
+      <div className={ui.card} aria-busy="true">
+        <Skeleton width="140px" height="22px" />
+        <div className={ui.skelStack}>
+          <Skeleton height="48px" />
+          <Skeleton height="48px" />
+          <Skeleton height="48px" />
+        </div>
       </div>
     );
   }

@@ -7,7 +7,7 @@ export default function AuthPage() {
   const [mode, setMode] = useState<AuthMode>("in");
 
   return (
-    <div className={styles.auth}>
+    <main className={styles.auth}>
       <div className={styles.card}>
         <h1 className={styles.brand}>Meal Tracker</h1>
         <p className={styles.tagline}>Track lunches and dinners. Know what you owe.</p>
@@ -33,6 +33,6 @@ export default function AuthPage() {
         </div>
         <AuthForm mode={mode} />
       </div>
-    </div>
+    </main>
   );
 }

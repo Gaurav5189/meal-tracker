@@ -9,7 +9,7 @@
   --card: #ffffff; /* cards, rows, sheets */
   --a: #aec4d4; /* accent: taken chips, focus ring */
   --tx: #2b1a1c; /* text */
-  --mu: #7d6c6e; /* muted text */
+  --mu: #6f5f61; /* muted text (AA on both --bg and --card) */
   --ln: #e5d3af; /* borders */
   --on-a: #14232e; /* text on accent */
   --on-p: #f5efe1; /* text on primary */

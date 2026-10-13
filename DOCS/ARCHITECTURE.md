@@ -4,7 +4,7 @@
 | Layer | Choice |
 |---|---|
 | Frontend | React 18, Vite, TypeScript (strict), React Router, TanStack Query, plain CSS (CSS Modules + `tokens.css`, no Tailwind), react-hook-form + zod, vite-plugin-pwa |
-| Backend | Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2 (async) + psycopg3, Alembic, argon2-cffi, PyJWT, slowapi |
+| Backend | Python 3.14, FastAPI, Pydantic v2, SQLAlchemy 2 (async) + psycopg3, Alembic, argon2-cffi, PyJWT, slowapi |
 | Database | Neon PostgreSQL (pooled connection string) |
 | Tests | Vitest + Testing Library, pytest + httpx |
 

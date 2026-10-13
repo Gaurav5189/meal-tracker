@@ -1,8 +1,8 @@
 # Project Index & Map
 
 ## Active State
-- **Current Phase:** Phase 0 — Setup (in progress; Neon migration check pending)
-- **Current Task:** Verify Alembic against Neon once `apps/meal-tracker-api/.env` has `DATABASE_URL`, then Phase 1
+- **Current Phase:** Phase 0 — Setup (completed)
+- **Current Task:** Ready to start Phase 1 — Login & Sign up
 
 ## Structure
 - `apps/react-frontend/` — Vite + React + TypeScript frontend

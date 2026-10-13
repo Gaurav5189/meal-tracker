@@ -1,10 +1,21 @@
 import re
-from zoneinfo import available_timezones
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
 _USERNAME_RE = re.compile(r"^[a-z0-9_]{3,20}$")
-_VALID_TZ = available_timezones()
+_TIMEZONE_ALIASES = {
+    "Asia/Calcutta": "Asia/Kolkata",
+}
+
+
+def _normalize_timezone(value: str) -> str:
+    timezone = _TIMEZONE_ALIASES.get(value, value)
+    try:
+        ZoneInfo(timezone)
+    except (ZoneInfoNotFoundError, ValueError, KeyError) as exc:
+        raise ValueError("Not a recognized timezone.") from exc
+    return timezone
 
 
 class SignupIn(BaseModel):
@@ -41,9 +52,7 @@ class SignupIn(BaseModel):
     @field_validator("tz")
     @classmethod
     def check_tz(cls, value: str) -> str:
-        if value not in _VALID_TZ:
-            raise ValueError("Not a recognized timezone.")
-        return value
+        return _normalize_timezone(value)
 
 
 class LoginIn(BaseModel):
@@ -64,6 +73,4 @@ class LoginIn(BaseModel):
     @field_validator("tz")
     @classmethod
     def check_tz(cls, value: str | None) -> str | None:
-        if value is not None and value not in _VALID_TZ:
-            raise ValueError("Not a recognized timezone.")
-        return value
+        return None if value is None else _normalize_timezone(value)

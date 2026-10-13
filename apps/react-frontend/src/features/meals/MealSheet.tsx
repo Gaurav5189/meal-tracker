@@ -121,7 +121,7 @@ export default function MealSheet({
         </div>
         <div className={styles.sheetActions}>
           <button type="button" className={styles.sheetReset} onClick={() => onPrice(null)}>
-            Reset to default
+            Reset to default price
           </button>
           <button type="button" className={styles.sheetClose} onClick={onClose}>
             Done

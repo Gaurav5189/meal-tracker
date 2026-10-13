@@ -5,6 +5,7 @@ import { NavLink, Navigate, Outlet, useLocation, useNavigate } from "react-route
 import ui from "../components/ui.module.css";
 import { ApiError } from "../lib/api";
 import { fetchMe, logout, meQueryKey } from "../features/auth/api";
+import OnboardingModal from "../features/onboarding/OnboardingModal";
 import styles from "./AppShell.module.css";
 
 const NAV_ITEMS = [
@@ -75,6 +76,7 @@ export default function AppShell() {
 
   return (
     <div className={styles.app}>
+      {!me.onboarded && <OnboardingModal me={me} />}
       <aside className={`${styles.sidebar} ${drawerOpen ? styles.open : ""}`}>
         <h2 className={styles.sideTitle}>Hello {me.name}</h2>
         <nav aria-label="Main">

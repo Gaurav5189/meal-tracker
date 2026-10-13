@@ -108,8 +108,9 @@ test("signup success stores the user and navigates to the app shell", async () =
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input);
     if (url.includes("/auth/signup"))
-      return jsonResponse({ username: "carl", name: "Carl", tz: "UTC" }, 201);
-    if (url.includes("/me")) return jsonResponse({ username: "carl", name: "Carl", tz: "UTC" });
+      return jsonResponse({ username: "carl", name: "Carl", tz: "UTC", onboarded: false }, 201);
+    if (url.includes("/me"))
+      return jsonResponse({ username: "carl", name: "Carl", tz: "UTC", onboarded: false });
     throw new Error(`unexpected fetch: ${url}`);
   });
   vi.stubGlobal("fetch", fetchMock);

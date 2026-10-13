@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiError } from "../../lib/api";
@@ -56,6 +56,11 @@ function applyPatchToCache(
   };
 }
 
+/** True when the user asked the OS to reduce motion; guarded for jsdom/old browsers. */
+function prefersReducedMotion(): boolean {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+}
+
 /** Meals dashboard: month card, bulk actions, table, sheet (ARCHITECTURE §7). */
 export default function MealsPage() {
   const queryClient = useQueryClient();
@@ -111,9 +116,48 @@ export default function MealsPage() {
     },
   });
 
+  const data = mealsQuery.data;
+
+  // --- "Go to today" pill (hooks must live above the early returns) -------
+  // Shows whenever today's row is not on screen: either the user is viewing
+  // another month, or they scrolled the current month so the today row left
+  // the viewport (below or above). Clicking it scrolls the row into view.
+  const todayRowRef = useRef<HTMLDivElement | null>(null);
+  const scrollPending = useRef(false);
+  const [todayVisible, setTodayVisible] = useState(true);
+  // Arrow points toward the row: above the viewport (scrolled past) → ↑.
+  const [todayAbove, setTodayAbove] = useState(false);
+
+  const setTodayRow = useCallback((el: HTMLDivElement | null) => {
+    todayRowRef.current = el;
+    // A jump from another month: scroll as soon as the row mounts.
+    if (el && scrollPending.current) {
+      scrollPending.current = false;
+      el.scrollIntoView?.({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "center",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = todayRowRef.current;
+    // jsdom (tests) and very old browsers have no IntersectionObserver; then
+    // the pill only reacts to the viewed month, which stays correct.
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        setTodayVisible(entries[0].isIntersecting);
+        setTodayAbove(entries[0].boundingClientRect.bottom < 0);
+      },
+      { threshold: 0 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [data, month]);
+
   // Totals recompute from the (optimistically patched) days so the month card
   // updates instantly; the server's own total stays the source of truth on refetch.
-  const data = mealsQuery.data;
   const totals = useMemo(() => {
     if (!data) return { total: 0, takenCount: 0 };
     let total = 0;
@@ -156,6 +200,10 @@ export default function MealsPage() {
     );
   }
 
+  // "Go to today" target follows the server's user-timezone date, not the
+  // device clock, so it stays consistent with the today row highlight.
+  const todayMonth = (data.today || todayIso()).slice(0, 7);
+
   const openSheet = (day: MealDay, mealType: MealType, meal: Meal) => {
     if (meal.locked) {
       toast("Locked: older than 48 hours");
@@ -177,6 +225,21 @@ export default function MealsPage() {
     return sheet.mealType === "lunch" ? day.lunch : day.dinner;
   })();
 
+  const goToToday = () => {
+    if (month !== todayMonth) {
+      // Switch month first; setTodayRow scrolls once the row mounts.
+      scrollPending.current = true;
+      setMonth(todayMonth);
+      return;
+    }
+    todayRowRef.current?.scrollIntoView?.({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "center",
+    });
+  };
+
+  const showGoToday = month !== todayMonth || !todayVisible;
+
   return (
     <>
       <MonthCard
@@ -192,7 +255,13 @@ export default function MealsPage() {
         today={data.today}
         currency={data.currency}
         onChipClick={openSheet}
+        todayRowRef={setTodayRow}
       />
+      {showGoToday && (
+        <button type="button" className={styles.goToday} onClick={goToToday}>
+          Go to today <span aria-hidden="true">{todayAbove ? "↑" : "↓"}</span>
+        </button>
+      )}
       {sheet && sheetMeal && (
         <MealSheet
           date={sheet.date}

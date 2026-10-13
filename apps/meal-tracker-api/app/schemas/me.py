@@ -5,12 +5,15 @@ class MeOut(BaseModel):
     username: str
     name: str
     tz: str
+    onboarded: bool
 
 
 class NameUpdateIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str
+    # Intro popup confirm. None = leave unchanged (plain profile name edits).
+    onboarded: bool | None = None
 
     @field_validator("name")
     @classmethod

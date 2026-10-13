@@ -1,0 +1,23 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100; /* above sidebar, drawer overlay, toasts */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  background: #0006;
+  backdrop-filter: blur(2px);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  margin: auto 0; /* centers when shorter than viewport, top-aligns when tall */
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.35);
+}
+
+.intro {
+  margin-bottom: 16px;
+}

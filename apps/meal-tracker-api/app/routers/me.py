@@ -10,7 +10,9 @@ router = APIRouter(tags=["me"])
 
 @router.get("/me")
 async def me(user: CurrentUser) -> MeOut:
-    return MeOut(username=user.username, name=user.name, tz=user.tz)
+    return MeOut(
+        username=user.username, name=user.name, tz=user.tz, onboarded=user.onboarded
+    )
 
 
 @router.patch("/me")

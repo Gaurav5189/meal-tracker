@@ -14,7 +14,7 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
-const ME = { username: "carl", name: "Carl", tz: "Asia/Kolkata" };
+const ME = { username: "carl", name: "Carl", tz: "Asia/Kolkata", onboarded: true };
 
 // staleTime: Infinity keeps the seeded /me cache fresh so mounts never refetch.
 function makeQueryClient() {

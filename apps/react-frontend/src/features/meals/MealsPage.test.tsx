@@ -144,7 +144,7 @@ test("resetting price with a cold settings cache fetches defaults instead of sho
   renderMeals(fetchMock);
 
   fireEvent.click(screen.getByLabelText("Lunch on 13/10/26"));
-  fireEvent.click(screen.getByRole("button", { name: "Reset to default" }));
+  fireEvent.click(screen.getByRole("button", { name: "Reset to default price" }));
 
   // Optimistic reset uses the fetched defaults (35), never 0.
   const chip = screen.getByLabelText("Lunch on 13/10/26");
@@ -154,6 +154,62 @@ test("resetting price with a cold settings cache fetches defaults instead of sho
     fetchMock.mock.calls as unknown as Array<[string | URL, RequestInit?]>
   ).filter(([url]) => String(url).includes("/settings"));
   expect(settingsFetches).toHaveLength(1);
+});
+
+test("go to today appears when viewing another month and returns to the current one", async () => {
+  const fetchMock = vi.fn(async () => jsonResponse(MEALS));
+  renderMeals(fetchMock);
+
+  // Current month: no pill.
+  expect(screen.queryByRole("button", { name: "Go to today" })).toBeNull();
+
+  // Navigate away: pill appears.
+  fireEvent.click(screen.getByRole("button", { name: "Previous month" }));
+  const pill = await screen.findByRole("button", { name: "Go to today" });
+  expect(pill).toBeDefined();
+
+  // Clicking it returns to the current month and hides the pill.
+  fireEvent.click(pill);
+  await waitFor(() => expect(screen.queryByRole("button", { name: "Go to today" })).toBeNull());
+  expect(screen.getByText(/^October/)).toBeDefined();
+});
+
+test("go to today appears when the today row is scrolled out of view, arrow points to it", async () => {
+  // Stub IntersectionObserver with a configurable rect; observe() reports once.
+  let report: (entry: Partial<IntersectionObserverEntry>) => void = () => {};
+  class FakeIO {
+    constructor(cb: IntersectionObserverCallback) {
+      report = (entry) =>
+        cb([entry as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+    }
+    observe() {}
+    disconnect() {}
+    unobserve() {}
+  }
+  vi.stubGlobal("IntersectionObserver", FakeIO);
+  const scrollMock = vi.fn();
+  const original = Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView = scrollMock;
+  try {
+    renderMeals(vi.fn(async () => jsonResponse(MEALS)));
+
+    // Today row below the viewport: pill shows with a down arrow; click scrolls to it.
+    report({ isIntersecting: false, boundingClientRect: { bottom: 900 } as DOMRect });
+    const pill = await screen.findByRole("button", { name: "Go to today" });
+    expect(pill.textContent).toContain("↓");
+    fireEvent.click(pill);
+    expect(scrollMock).toHaveBeenCalledTimes(1);
+
+    // Scrolled past it (row above the viewport): arrow flips up.
+    report({ isIntersecting: false, boundingClientRect: { bottom: -40 } as DOMRect });
+    await waitFor(() => expect(pill.textContent).toContain("↑"));
+
+    // Row scrolled back into view: pill hides.
+    report({ isIntersecting: true, boundingClientRect: { bottom: 300 } as DOMRect });
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Go to today" })).toBeNull());
+  } finally {
+    Element.prototype.scrollIntoView = original;
+  }
 });
 
 test("locked chips show a toast instead of opening the sheet", async () => {

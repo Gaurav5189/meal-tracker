@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.core.security import CSRF_COOKIE, SESSION_COOKIE
 from app.main import app
+from app.schemas.auth import _normalize_timezone
 
 from .conftest import TEST_USERNAME_PREFIX
 
@@ -24,12 +25,21 @@ def _signup_body(username=None):
     }
 
 
+def test_browser_timezone_alias_is_accepted():
+    assert _normalize_timezone("Asia/Calcutta") == "Asia/Kolkata"
+
+
 @pytest.mark.db
 def test_signup_creates_user_and_sets_cookies(clean_db):
     body = _signup_body()
     res = client.post("/api/v1/auth/signup", json=body)
     assert res.status_code == 201
-    assert res.json() == {"username": body["username"], "name": "Test User", "tz": "Asia/Kolkata"}
+    assert res.json() == {
+        "username": body["username"],
+        "name": "Test User",
+        "tz": "Asia/Kolkata",
+        "onboarded": False,
+    }
     assert SESSION_COOKIE in client.cookies
     assert CSRF_COOKIE in client.cookies
     # Session cookie works immediately.

@@ -55,6 +55,38 @@ def test_patch_me_requires_csrf(clean_db):
 
 
 @pytest.mark.db
+def test_new_user_not_onboarded_and_signup_reports_it(clean_db):
+    _signup()
+    me = client.get("/api/v1/me")
+    assert me.status_code == 200
+    assert me.json()["onboarded"] is False
+
+
+@pytest.mark.db
+def test_patch_me_confirms_onboarding(clean_db):
+    _signup()
+    res = client.patch(
+        "/api/v1/me", json={"name": "Test User", "onboarded": True}, headers=_csrf_headers()
+    )
+    assert res.status_code == 200
+    assert res.json()["onboarded"] is True
+    # Persists: /me still reports onboarded after the "confirm".
+    assert client.get("/api/v1/me").json()["onboarded"] is True
+
+
+@pytest.mark.db
+def test_patch_me_name_only_keeps_onboarded_flag(clean_db):
+    _signup()
+    res = client.patch(
+        "/api/v1/me", json={"name": "Test User", "onboarded": True}, headers=_csrf_headers()
+    )
+    assert res.status_code == 200
+    res = client.patch("/api/v1/me", json={"name": "Renamed"}, headers=_csrf_headers())
+    assert res.status_code == 200
+    assert client.get("/api/v1/me").json()["onboarded"] is True
+
+
+@pytest.mark.db
 def test_change_password_requires_correct_current_password(clean_db):
     body = _signup()
     res = client.post(

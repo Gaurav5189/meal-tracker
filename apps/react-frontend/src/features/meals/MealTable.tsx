@@ -7,6 +7,8 @@ interface MealTableProps {
   today: string; // YYYY-MM-DD in the user's timezone
   currency: string;
   onChipClick: (day: MealDay, mealType: MealType, meal: Meal) => void;
+  /** Receives the today-row element (or null) whenever it mounts/unmounts. */
+  todayRowRef?: (el: HTMLDivElement | null) => void;
 }
 
 interface MealChipProps {
@@ -42,13 +44,22 @@ function MealChip({ meal, mealType, date, currency, onClick }: MealChipProps) {
       onClick={onClick}
     >
       {meal.taken ? "✓ Taken" : "Skipped"}
-      <small>{meal.locked ? "🔒 " : ""}{formatMoney(currency, Number(meal.price))}</small>
+      <small>
+        {meal.locked ? "🔒 " : ""}
+        {formatMoney(currency, Number(meal.price))}
+      </small>
     </button>
   );
 }
 
 /** One row per date, columns Date / Lunch / Dinner; today's row highlighted. */
-export default function MealTable({ days, today, currency, onChipClick }: MealTableProps) {
+export default function MealTable({
+  days,
+  today,
+  currency,
+  onChipClick,
+  todayRowRef,
+}: MealTableProps) {
   return (
     <>
       <div className={styles.head}>
@@ -60,6 +71,7 @@ export default function MealTable({ days, today, currency, onChipClick }: MealTa
         {days.map((day) => (
           <div
             key={day.date}
+            ref={day.date === today ? todayRowRef : undefined}
             className={`${styles.row} ${day.date === today ? styles.rowToday : ""}`}
           >
             <div className={styles.dateCell}>

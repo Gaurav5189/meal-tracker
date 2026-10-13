@@ -3,14 +3,16 @@
   min-height: 100vh;
 }
 
-/* Sidebar: drawer below 900px, fixed ≥900px — demo's aside. */
+/* Sidebar: drawer below 900px, fixed ≥900px — demo's aside.
+   App z-scale: content 0 < go-to-today pill 20 < meal sheet 30
+   < drawer scrim 32 < drawer 35 < toasts 40 < onboarding 100. */
 .sidebar {
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   width: 260px;
-  z-index: 20;
+  z-index: 35;
   background: var(--p);
   color: var(--on-p);
   padding: calc(20px + env(safe-area-inset-top, 0px)) var(--sp-4)
@@ -60,7 +62,7 @@
   position: fixed;
   inset: 0;
   background: #0006;
-  z-index: 15;
+  z-index: 32; /* under the drawer (35), over all page content */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s;

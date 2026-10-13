@@ -15,7 +15,7 @@ from app.services.settings import get_settings_row
 
 
 def me_out(user: User) -> MeOut:
-    return MeOut(username=user.username, name=user.name, tz=user.tz)
+    return MeOut(username=user.username, name=user.name, tz=user.tz, onboarded=user.onboarded)
 
 
 def _username_taken() -> AppError:

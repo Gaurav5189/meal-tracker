@@ -10,6 +10,8 @@ from app.schemas.me import NameUpdateIn, PasswordChangeIn
 
 async def update_name(user: User, data: NameUpdateIn, db: AsyncSession) -> User:
     user.name = data.name
+    if data.onboarded is not None:
+        user.onboarded = data.onboarded
     await db.commit()
     await db.refresh(user)
     return user

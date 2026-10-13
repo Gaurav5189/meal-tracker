@@ -17,14 +17,14 @@ def _client_ip(request: Request) -> str:
 async def signup(payload: SignupIn, request: Request, response: Response, db: DbDep) -> MeOut:
     user = await auth_service.signup(payload, _client_ip(request), db)
     set_auth_cookies(response, user.id)
-    return MeOut(username=user.username, name=user.name, tz=user.tz)
+    return auth_service.me_out(user)
 
 
 @router.post("/login")
 async def login(payload: LoginIn, request: Request, response: Response, db: DbDep) -> MeOut:
     user = await auth_service.login(payload, _client_ip(request), db)
     set_auth_cookies(response, user.id)
-    return MeOut(username=user.username, name=user.name, tz=user.tz)
+    return auth_service.me_out(user)
 
 
 @router.post("/logout")

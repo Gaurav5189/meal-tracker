@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiError } from "../../lib/api";
 import { useToast } from "../../components/ToastContext";
-import { settingsQueryKey } from "../settings/api";
+import { settingsQueryKey, fetchSettings, type Settings } from "../settings/api";
 import {
   fetchMeals,
   mealsQueryKey,
@@ -47,7 +47,11 @@ function applyPatchToCache(
         }
         return next;
       };
-      return { ...day, lunch: patchMealInDay("lunch", day.lunch), dinner: patchMealInDay("dinner", day.dinner) };
+      return {
+        ...day,
+        lunch: patchMealInDay("lunch", day.lunch),
+        dinner: patchMealInDay("dinner", day.dinner),
+      };
     }),
   };
 }
@@ -66,21 +70,32 @@ export default function MealsPage() {
     onMutate: async ({ id, patch }) => {
       await queryClient.cancelQueries({ queryKey: mealsQueryKey(month) });
       const previous = queryClient.getQueryData<MealsMonth>(mealsQueryKey(month));
-      const settings = queryClient.getQueryData<{
-        lunch_price: string;
-        dinner_price: string;
-        dinner_same_as_lunch: boolean;
-      }>(settingsQueryKey);
+      // The settings cache is only filled after SettingsPage has been opened.
+      // A price reset needs real defaults: fetch them rather than showing 0.
+      let settings = queryClient.getQueryData<Settings>(settingsQueryKey);
+      if (previous && patch.price === null && !settings) {
+        try {
+          settings = await queryClient.fetchQuery({
+            queryKey: settingsQueryKey,
+            queryFn: fetchSettings,
+          });
+        } catch {
+          // No defaults available: skip only the price patch (the taken change
+          // still applies optimistically); the onSettled refetch corrects price.
+        }
+      }
+      const cachePatch: MealPatch =
+        patch.price === null && !settings ? { taken: patch.taken } : patch;
       const defaults = {
         lunch: Number(settings?.lunch_price ?? 0),
         dinner: Number(
-          settings?.dinner_same_as_lunch ? settings.lunch_price : settings?.dinner_price ?? 0,
+          settings?.dinner_same_as_lunch ? settings.lunch_price : (settings?.dinner_price ?? 0),
         ),
       };
       if (previous) {
         queryClient.setQueryData<MealsMonth>(
           mealsQueryKey(month),
-          applyPatchToCache(previous, id, patch, defaults),
+          applyPatchToCache(previous, id, cachePatch, defaults),
         );
       }
       return { previous };
@@ -123,10 +138,16 @@ export default function MealsPage() {
   }
 
   if (mealsQuery.isError || !data) {
+    // Surface the server's reason (e.g. a month past the materialization
+    // horizon) instead of a generic dead-end.
+    const reason =
+      mealsQuery.error instanceof ApiError
+        ? (mealsQuery.error.fields?.month?.[0] ?? mealsQuery.error.message)
+        : null;
     return (
       <div className={ui.card}>
         <p className={ui.formError} role="alert">
-          Something went wrong while loading your meals.
+          {reason ?? "Something went wrong while loading your meals."}
         </p>
         <button className={ui.btn} type="button" onClick={() => mealsQuery.refetch()}>
           Retry
@@ -166,7 +187,12 @@ export default function MealsPage() {
         onMonthChange={setMonth}
       />
       <BulkActions month={month} today={data.today || todayIso()} />
-      <MealTable days={data.days} today={data.today} currency={data.currency} onChipClick={openSheet} />
+      <MealTable
+        days={data.days}
+        today={data.today}
+        currency={data.currency}
+        onChipClick={openSheet}
+      />
       {sheet && sheetMeal && (
         <MealSheet
           date={sheet.date}

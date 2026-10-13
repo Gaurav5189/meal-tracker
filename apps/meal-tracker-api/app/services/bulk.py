@@ -7,6 +7,7 @@ never rejected. Everything happens in a single transaction.
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.errors import AppError
 from app.models import Meal, User, UserSettings
 from app.schemas.meals import BulkIn, BulkOut
 from app.services import materialize
@@ -16,6 +17,14 @@ from app.services.lock import lock_cutoff
 async def bulk_update(
     user: User, settings_row: UserSettings, data: BulkIn, db: AsyncSession
 ) -> BulkOut:
+    # Same horizon guard as GET /meals: materializing an unbounded range would
+    # build a huge INSERT and push materialized_through into the far future.
+    if data.date_to > materialize.horizon_for(user):
+        raise AppError(
+            "validation_error",
+            "Check the highlighted fields.",
+            fields={"to": ["That date is too far in the future."]},
+        )
     # Make sure rows exist for the whole range (extends the window when needed).
     await materialize.ensure_window(user, db, settings_row, through=data.date_to)
 

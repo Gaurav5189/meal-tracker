@@ -87,6 +87,13 @@ def test_bulk_validates_range_and_types(clean_db):
     res = _bulk(csrf, today + timedelta(days=2), today)
     assert res.status_code == 422
     assert res.json()["error"]["code"] == "validation_error"
+    # to past the materialization horizon
+    res = _bulk(csrf, today, date(9999, 12, 31))
+    assert res.status_code == 422
+    assert res.json()["error"]["fields"]["to"] == ["That date is too far in the future."]
+    # Nothing was written for the far range and near ranges still work.
+    assert _count_taken(date(9999, 12, 31)) == 0
+    assert _bulk(csrf, today, today).json()["updated"] == 2
     # unknown meal type
     res = client.post(
         "/api/v1/meals/bulk",

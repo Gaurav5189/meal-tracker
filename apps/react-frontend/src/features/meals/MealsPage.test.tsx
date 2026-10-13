@@ -59,7 +59,8 @@ function renderMeals(fetchMock: ReturnType<typeof vi.fn>) {
 
 function callsTo(fetchMock: ReturnType<typeof vi.fn>, method: string) {
   return (fetchMock.mock.calls as unknown as Array<[string | URL, RequestInit]>).filter(
-    ([url, init]) => String(url).includes(method === "PATCH" ? "/meals/" : "/meals") && init?.method === method,
+    ([url, init]) =>
+      String(url).includes(method === "PATCH" ? "/meals/" : "/meals") && init?.method === method,
   );
 }
 
@@ -124,6 +125,35 @@ test("editing the price in the sheet sends the custom price and marks it", async
   expect(JSON.parse(String(init.body))).toEqual({ price: 60 });
   // The sheet shows the (custom) marker after saving.
   expect(screen.getByText(/Meal cost: ₹60 \(custom\)/)).toBeDefined();
+});
+
+test("resetting price with a cold settings cache fetches defaults instead of showing 0", async () => {
+  const SETTINGS = {
+    currency: "INR",
+    lunch_price: "35",
+    dinner_price: "35",
+    dinner_same_as_lunch: true,
+    upcoming_default_on: true,
+    lock_past_meals: false,
+  };
+  const fetchMock = vi.fn(async (url: string | URL, init?: RequestInit) => {
+    if (init?.method === "PATCH") return new Promise<Response>(() => {});
+    if (String(url).includes("/settings")) return jsonResponse(SETTINGS);
+    return jsonResponse(MEALS);
+  });
+  renderMeals(fetchMock);
+
+  fireEvent.click(screen.getByLabelText("Lunch on 13/10/26"));
+  fireEvent.click(screen.getByRole("button", { name: "Reset to default" }));
+
+  // Optimistic reset uses the fetched defaults (35), never 0.
+  const chip = screen.getByLabelText("Lunch on 13/10/26");
+  await waitFor(() => expect(chip.textContent).toContain("₹35"));
+  expect(screen.getByText("Meal price total").parentElement?.textContent).toContain("₹35");
+  const settingsFetches = (
+    fetchMock.mock.calls as unknown as Array<[string | URL, RequestInit?]>
+  ).filter(([url]) => String(url).includes("/settings"));
+  expect(settingsFetches).toHaveLength(1);
 });
 
 test("locked chips show a toast instead of opening the sheet", async () => {

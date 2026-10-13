@@ -24,6 +24,17 @@ from app.services.pricing import default_price
 from app.services.timeutil import local_today, safe_zone
 
 WINDOW_DAYS = 60
+# Hard ceiling on how far ahead rows may be materialized. A client-chosen
+# `through` (month fetch or bulk range) is validated against this at the API
+# layer; the clamp below is defense-in-depth so one request can never build a
+# huge INSERT or push materialized_through into the far future (which would
+# permanently stop gap-filling: start = materialized_through+1 would pass end).
+MAX_HORIZON_DAYS = 400
+
+
+def horizon_for(user: User) -> date:
+    """Latest date a client-requested window may end (422 beyond this)."""
+    return local_today(user.tz) + timedelta(days=MAX_HORIZON_DAYS)
 
 
 def signup_date(user: User) -> date:
@@ -59,6 +70,7 @@ async def ensure_window(
     end = today + timedelta(days=WINDOW_DAYS)
     if through is not None and through > end:
         end = through
+    end = min(end, today + timedelta(days=MAX_HORIZON_DAYS))
     if start > end:
         return
 

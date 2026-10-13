@@ -60,11 +60,20 @@ async def get_month(
     user: User, settings_row: UserSettings, month: str, db: AsyncSession
 ) -> MealsMonthOut:
     start, end = parse_month(month)
+    today = local_today(user.tz)
+    # Reject months past the horizon BEFORE materializing: otherwise one request
+    # could insert millions of rows and push materialized_through into the far
+    # future, permanently stopping gap-filling (start would pass end).
+    if end > materialize.horizon_for(user):
+        raise AppError(
+            "validation_error",
+            "Check the highlighted fields.",
+            fields={"month": ["That month is too far in the future."]},
+        )
     # Fetching a month beyond the window extends materialization (ARCHITECTURE §4.1).
     await materialize.ensure_window(user, db, settings_row, through=end)
     await db.commit()
 
-    today = local_today(user.tz)
     rows = (
         (
             await db.execute(

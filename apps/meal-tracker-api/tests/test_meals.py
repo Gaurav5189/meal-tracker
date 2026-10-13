@@ -96,6 +96,23 @@ def test_get_meals_rejects_bad_month(clean_meals):
 
 
 @pytest.mark.db
+def test_get_meals_rejects_month_past_horizon(clean_meals):
+    """A far month must 422 BEFORE materializing: otherwise one request inserts
+    millions of rows and pushes materialized_through into the far future, which
+    would permanently stop gap-filling."""
+    _signup()
+    res = _get("9999-12")
+    assert res.status_code == 422
+    assert res.json()["error"]["fields"]["month"] == ["That month is too far in the future."]
+    # Regression: the near month still materializes real rows (id not null),
+    # proving materialized_through was not pushed past the horizon.
+    today = _today()
+    ok = _get(_month_str(today))
+    assert ok.status_code == 200
+    assert _day(ok.json(), _iso(today))["lunch"]["id"] is not None
+
+
+@pytest.mark.db
 def test_get_meals_materializes_current_month(clean_meals):
     _signup()
     today = _today()

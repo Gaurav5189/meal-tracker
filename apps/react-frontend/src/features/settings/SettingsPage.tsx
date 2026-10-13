@@ -59,7 +59,8 @@ export default function SettingsPage() {
   const same = watch("dinner_same_as_lunch");
   const lunch = watch("lunch_price");
 
-  // Demo's sync(): dinner mirrors lunch and is disabled while "same" is on.
+  // Demo's sync(): dinner mirrors lunch and is read-only while "same" is on.
+  // readOnly (not disabled) keeps the registered value defined for RHF.
   useEffect(() => {
     if (same && Number.isFinite(lunch)) setValue("dinner_price", lunch);
   }, [same, lunch, setValue]);
@@ -167,7 +168,7 @@ export default function SettingsPage() {
             type="number"
             min="0"
             step="0.01"
-            disabled={same}
+            readOnly={same}
             aria-invalid={formState.errors.dinner_price != null}
             {...register("dinner_price", { valueAsNumber: true })}
           />

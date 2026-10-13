@@ -52,6 +52,30 @@ test("shows the editable name and read-only username", () => {
   expect(username.readOnly).toBe(true);
 });
 
+test("a late-arriving /me response fills the name field (values sync)", async () => {
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse(ME)));
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+  });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>
+        <MemoryRouter initialEntries={["/profile"]}>
+          <Routes>
+            <Route path="/profile" element={<ProfilePage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>
+    </QueryClientProvider>,
+  );
+
+  // Cache miss at mount → the page renders nothing yet; then the query resolves.
+  expect(screen.queryByLabelText("Name")).toBeNull();
+
+  const nameInput = await screen.findByLabelText("Name");
+  expect((nameInput as HTMLInputElement).value).toBe("Carl");
+});
+
 test("saving the name sends PATCH /me and confirms with a toast", async () => {
   const fetchMock = vi.fn(async () => jsonResponse({ ...ME, name: "Carlita" }));
   vi.stubGlobal("fetch", fetchMock);

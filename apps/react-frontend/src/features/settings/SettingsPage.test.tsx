@@ -56,22 +56,41 @@ test("renders the loaded settings", () => {
   expect((screen.getByLabelText(/Lock past meals/) as HTMLInputElement).checked).toBe(false);
 });
 
-test("dinner mirrors lunch and is disabled while 'same as lunch' is on", () => {
+test("dinner mirrors lunch and is read-only while 'same as lunch' is on", () => {
   renderSettings();
 
   const dinner = screen.getByLabelText("Dinner") as HTMLInputElement;
-  expect(dinner.disabled).toBe(true);
+  expect(dinner.readOnly).toBe(true);
 
   fireEvent.change(screen.getByLabelText("Lunch"), { target: { value: "40" } });
   expect(dinner.value).toBe("40");
 });
 
-test("unchecking 'same as lunch' enables the dinner input", () => {
+test("unchecking 'same as lunch' makes the dinner input editable", () => {
   renderSettings();
 
   const dinner = screen.getByLabelText("Dinner") as HTMLInputElement;
   fireEvent.click(screen.getByLabelText("Dinner same as lunch"));
-  expect(dinner.disabled).toBe(false);
+  expect(dinner.readOnly).toBe(false);
+});
+
+test("saving in the default state (same-as-lunch on) reaches the API with the mirrored dinner price", async () => {
+  const fetchMock = vi.fn(async () => jsonResponse(SETTINGS));
+  vi.stubGlobal("fetch", fetchMock);
+  renderSettings();
+
+  fireEvent.click(screen.getByRole("button", { name: "Save settings" }));
+
+  expect(await screen.findByText("Settings saved")).toBeDefined();
+  const put = (fetchMock.mock.calls as unknown as Array<[URL, RequestInit]>).find(
+    ([, init]) => init.method === "PUT",
+  );
+  expect(put).toBeDefined();
+  expect(JSON.parse(String(put?.[1].body))).toMatchObject({
+    lunch_price: 35,
+    dinner_price: 35,
+    dinner_same_as_lunch: true,
+  });
 });
 
 test("a negative price shows an inline error and skips the request", async () => {

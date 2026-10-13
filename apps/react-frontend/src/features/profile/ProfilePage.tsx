@@ -41,7 +41,9 @@ export default function ProfilePage() {
 
   const nameForm = useForm<NameValues>({
     resolver: zodResolver(nameSchema),
-    defaultValues: { name: meQuery.data?.name ?? "" },
+    defaultValues: { name: "" },
+    // Syncs when ['me'] arrives or changes (deep-equal, so typing isn't clobbered).
+    values: meQuery.data ? { name: meQuery.data.name } : undefined,
   });
   const passwordForm = useForm<PasswordValues>({
     resolver: zodResolver(passwordSchema),

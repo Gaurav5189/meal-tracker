@@ -29,6 +29,23 @@ def test_browser_timezone_alias_is_accepted():
     assert _normalize_timezone("Asia/Calcutta") == "Asia/Kolkata"
 
 
+def test_host_dependent_tz_keys_are_rejected():
+    # posix//right/ builds, the deprecated posixrules file, and "localtime"
+    # resolve via ZoneInfo on some hosts but are not real user timezones.
+    for key in ("posix/Asia/Kolkata", "right/UTC", "posixrules", "localtime"):
+        with pytest.raises(ValueError, match="Not a recognized timezone."):
+            _normalize_timezone(key)
+
+
+def test_real_zones_and_legacy_links_still_pass():
+    # ZoneInfo stays the source of truth; every browser-emittable key passes.
+    assert _normalize_timezone("Asia/Kolkata") == "Asia/Kolkata"
+    assert _normalize_timezone("Europe/Kiev") == "Europe/Kiev"
+    assert _normalize_timezone("US/Eastern") == "US/Eastern"
+    assert _normalize_timezone("Etc/GMT+5") == "Etc/GMT+5"
+    assert _normalize_timezone("UTC") == "UTC"
+
+
 @pytest.mark.db
 def test_signup_creates_user_and_sets_cookies(clean_db):
     body = _signup_body()

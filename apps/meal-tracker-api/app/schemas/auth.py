@@ -7,10 +7,23 @@ _USERNAME_RE = re.compile(r"^[a-z0-9_]{3,20}$")
 _TIMEZONE_ALIASES = {
     "Asia/Calcutta": "Asia/Kolkata",
 }
+# ZoneInfo resolves keys that are not real user timezones: the tzdata "posix/"
+# and "right/" subtrees (POSIX-TZ / leap-second builds), the deprecated
+# "posixrules" file, and "localtime" on hosts that ship it in TZPATH. These are
+# host-layout-dependent, so accepting them makes validation nondeterministic
+# across machines. Browsers never emit them (Intl reports IANA keys, including
+# legacy links like Asia/Calcutta), so rejecting them cannot break a real user.
+# Do NOT validate against available_timezones(): its contents depend on how the
+# host's tzdata ships backward links, which 422'd Asia/Calcutta on Azure
+# (2026-10-14 incident). ZoneInfo stays the source of truth.
+_TZ_DENYLIST_KEYS = {"localtime", "posixrules"}
+_TZ_DENYLIST_PREFIXES = ("posix/", "right/")
 
 
 def _normalize_timezone(value: str) -> str:
     timezone = _TIMEZONE_ALIASES.get(value, value)
+    if timezone in _TZ_DENYLIST_KEYS or timezone.startswith(_TZ_DENYLIST_PREFIXES):
+        raise ValueError("Not a recognized timezone.")
     try:
         ZoneInfo(timezone)
     except (ZoneInfoNotFoundError, ValueError, KeyError) as exc:

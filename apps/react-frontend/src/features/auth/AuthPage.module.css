@@ -1,0 +1,134 @@
+/* Auth screen + shared card/button styles — mirrors Make/Meal Tracker demo v2.html. */
+
+.auth {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-5);
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--card);
+  border: 1px solid var(--ln);
+  border-radius: var(--radius-card);
+  padding: var(--sp-5);
+}
+
+.brand {
+  font-size: 30px;
+  color: var(--p);
+  margin: 0 0 var(--sp-1);
+}
+
+.tagline {
+  color: var(--mu);
+  font-size: 14px;
+}
+
+.tabs {
+  display: flex;
+  background: var(--bg);
+  border-radius: var(--radius-input);
+  padding: 4px;
+  margin: 18px 0;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 6px;
+  border-radius: 9px;
+  font-weight: 700;
+  color: var(--mu);
+}
+
+.tabOn {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.label {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  margin: 12px 0 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--ln);
+  border-radius: var(--radius-input);
+  background: var(--bg);
+}
+
+.lrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.lrow .label {
+  margin: 12px 0 6px;
+}
+
+.warn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--s);
+  color: var(--p);
+  font-weight: 800;
+  line-height: 1;
+  flex: none;
+}
+
+.pop {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  z-index: 5;
+  background: var(--tx);
+  color: var(--bg);
+  padding: 10px 12px;
+  border-radius: var(--radius-chip);
+  font-size: 13px;
+  width: 240px;
+  box-shadow: 0 6px 20px #0004;
+}
+
+.btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px;
+  border-radius: var(--radius-input);
+  background: var(--p);
+  color: var(--on-p);
+  font-weight: 800;
+  transition: transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.formError {
+  margin: 12px 0 0;
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.fieldError {
+  margin: 4px 0 0;
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 600;
+}

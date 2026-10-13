@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "dev-only-change-me"
     cors_origins: str = "http://localhost:5173"
     cookie_domain: str = ""
+    cookie_secure: bool = True
     debug: bool = False
 
     @property

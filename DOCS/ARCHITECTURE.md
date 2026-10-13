@@ -117,4 +117,4 @@ Load → GET /me
 - "Today" and month boundaries computed from `users.tz`; money formatted via `Intl.NumberFormat(locale, {style:'currency', currency})`.
 
 ## 8. Deployment
-Frontend: static host (Vercel/Netlify/Cloudflare Pages). Backend: container host (Fly/Render/Railway). Env vars: `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGINS`, `COOKIE_DOMAIN`. Migrations run with Alembic on deploy.
+Frontend: static host (Vercel/Netlify/Cloudflare Pages). Backend: container host (Fly/Render/Railway). Env vars: `DATABASE_URL`, `JWT_SECRET` (>= 32 chars, must not be repo default `dev-only-change-me` when DEBUG=false), `CORS_ORIGINS`, `COOKIE_DOMAIN`, `DEBUG` (false in production). Migrations run with Alembic on deploy.

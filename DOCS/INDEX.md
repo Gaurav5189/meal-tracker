@@ -1,8 +1,8 @@
 # Project Index & Map
 
 ## Active State
-- **Current Phase:** Phase 1 — Login & Sign up (completed)
-- **Current Task:** Ready to start Phase 2 — App Shell & Profile
+- **Current Phase:** Phase 3 — Settings (completed)
+- **Current Task:** Ready to start Phase 4 — Meals Dashboard
 
 ## Structure
 - `apps/react-frontend/` — Vite + React + TypeScript frontend

@@ -62,3 +62,12 @@ export const apiGet = <T>(path: string) => request<T>(path);
 
 export const apiPost = <T>(path: string, body?: unknown) =>
   request<T>(path, { method: "POST", body: body === undefined ? undefined : JSON.stringify(body) });
+
+export const apiPut = <T>(path: string, body?: unknown) =>
+  request<T>(path, { method: "PUT", body: body === undefined ? undefined : JSON.stringify(body) });
+
+export const apiPatch = <T>(path: string, body?: unknown) =>
+  request<T>(path, {
+    method: "PATCH",
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });

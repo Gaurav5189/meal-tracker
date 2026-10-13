@@ -3,6 +3,8 @@ import os
 
 # The TestClient speaks plain http, so Secure cookies would never be sent back.
 os.environ.setdefault("COOKIE_SECURE", "false")
+# Force a deterministic, non-default test secret regardless of the developer's local .env.
+os.environ["JWT_SECRET"] = "test-secret-32-chars-0123456789abcdef0123456789abcde"
 
 import pytest  # noqa: E402
 from sqlalchemy import delete  # noqa: E402

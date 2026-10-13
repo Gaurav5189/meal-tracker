@@ -5,14 +5,17 @@ import "@fontsource-variable/fraunces";
 import "@fontsource-variable/nunito";
 import "./styles/tokens.css";
 import "./styles/index.css";
+import { ErrorBoundary } from "./app/ErrorBoundary";
 import { Providers } from "./app/providers";
 import { AppRoutes } from "./app/routes";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Providers>
-        <AppRoutes />
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
       </Providers>
     </BrowserRouter>
   </StrictMode>,

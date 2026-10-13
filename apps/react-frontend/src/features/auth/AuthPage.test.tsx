@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, expect, test, vi } from "vitest";
 
 import AuthPage from "./AuthPage";
-import { LoggedInPlaceholder } from "./LoggedInPlaceholder";
+import AppShell from "../../app/AppShell";
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -104,7 +104,7 @@ test("failed login shows the generic error message from the server", async () =>
   expect(screen.getByRole("alert").textContent).toBe("Invalid username or password.");
 });
 
-test("signup success stores the user and navigates to the placeholder home", async () => {
+test("signup success stores the user and navigates to the app shell", async () => {
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input);
     if (url.includes("/auth/signup"))
@@ -120,7 +120,9 @@ test("signup success stores the user and navigates to the placeholder home", asy
       <MemoryRouter initialEntries={["/auth"]}>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/" element={<LoggedInPlaceholder />} />
+          <Route element={<AppShell />}>
+            <Route path="/" element={<p>Meals content</p>} />
+          </Route>
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
@@ -133,13 +135,14 @@ test("signup success stores the user and navigates to the placeholder home", asy
   fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
   expect(await screen.findByText("Hello Carl")).toBeDefined();
+  expect(screen.getByRole("navigation", { name: "Main" })).toBeDefined();
 
   const signupCall = fetchMock.mock.calls.find(([url]) => String(url).includes("/auth/signup"));
   const [, init] = signupCall as unknown as [URL, RequestInit];
   expect(JSON.parse(String(init.body)).username).toBe("carl"); // lowercased like the backend
 });
 
-test("placeholder home redirects to /auth when the session is missing", async () => {
+test("app shell redirects to /auth when the session is missing", async () => {
   vi.stubGlobal(
     "fetch",
     vi.fn(async () =>
@@ -153,7 +156,9 @@ test("placeholder home redirects to /auth when the session is missing", async ()
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/" element={<LoggedInPlaceholder />} />
+          <Route element={<AppShell />}>
+            <Route path="/" element={<p>Meals content</p>} />
+          </Route>
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,

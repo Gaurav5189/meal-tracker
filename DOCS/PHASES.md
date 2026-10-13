@@ -13,14 +13,15 @@ Rule: finish a phase (all "Done when" items) and update `MEMORY.md` before start
 - UI: AuthPage with tabs, name/username/password fields, password warning icon + popover, error states, timezone capture.
 - Done when: can sign up, log in, reload while staying logged in, log out; wrong credentials show a generic error; tests pass.
 
-## Phase 2 — App Shell & Profile
+## Phase 2 — App Shell & Profile  (completed)
 - Sidebar (drawer on mobile, fixed ≥900px), "Hello {name}", Log out, route guard, error boundary, toast.
 - Profile: editable name, read-only username, change password.
 - Done when: navigation works on mobile and desktop; name change reflects in the sidebar; password change requires the current password.
 
-## Phase 3 — Settings
+## Phase 3 — Settings  (completed)
 - `GET/PUT /settings`; currency picker, default lunch/dinner cost, Same-as-lunch, upcoming-default switch, lock-past-meals switch.
 - Done when: settings persist; dinner mirrors lunch when "same" is on; validation errors are inline.
+- Note: applying changes to future meals (§4.2) is deferred to Phase 5 (needs the materialization service), so `PUT /settings` currently only persists.
 
 ## Phase 4 — Meals Dashboard (read + single edit)
 - Migration: `meals`. Materialization service + `GET /meals?month=`. `PATCH /meals/{id}`.

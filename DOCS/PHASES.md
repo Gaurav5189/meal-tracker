@@ -23,16 +23,17 @@ Rule: finish a phase (all "Done when" items) and update `MEMORY.md` before start
 - Done when: settings persist; dinner mirrors lunch when "same" is on; validation errors are inline.
 - Note: applying changes to future meals (§4.2) is deferred to Phase 5 (needs the materialization service), so `PUT /settings` currently only persists.
 
-## Phase 4 — Meals Dashboard (read + single edit)
+## Phase 4 — Meals Dashboard (read + single edit)  (completed)
 - Migration: `meals`. Materialization service + `GET /meals?month=`. `PATCH /meals/{id}`.
 - UI: MonthCard (total, count, month nav), MealTable, MealChip, MealSheet (check/uncheck, price edit), optimistic updates.
 - Done when: toggling and price edit work and update totals instantly; reload shows correct data; today row highlighted; custom price marker shown.
+- Note: days before the signup date are read-only synthetic rows (no history fabricated).
 
-## Phase 5 — Defaults Propagation & Locking
+## Phase 5 — Defaults Propagation & Locking  (completed)
 - Apply settings changes to future non-manual rows only (§4.2). Lock rule server + UI (faded, disabled, 423 handling).
 - Done when: tests prove today/past rows never change on settings edits, manual rows survive, 48h lock matches the rule in the user's timezone.
 
-## Phase 6 — Bulk Actions
+## Phase 6 — Bulk Actions  (completed)
 - `POST /meals/bulk`; BulkActions block under the month card with presets and result message.
 - Done when: range/meal-type/action work; locked meals are skipped and counted; single transaction.
 

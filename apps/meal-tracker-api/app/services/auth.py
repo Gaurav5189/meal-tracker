@@ -10,6 +10,8 @@ from app.core.security import dummy_verify, hash_password, verify_password
 from app.models import User, UserSettings
 from app.schemas.auth import LoginIn, SignupIn
 from app.schemas.me import MeOut
+from app.services import materialize
+from app.services.settings import get_settings_row
 
 
 def me_out(user: User) -> MeOut:
@@ -42,6 +44,10 @@ async def signup(data: SignupIn, ip: str, db: AsyncSession) -> User:
         # infer that `users` must be inserted before `settings`.
         await db.flush()
         db.add(UserSettings(user_id=user.id))
+        await db.flush()
+        # Materialize the meal window for the new account (ARCHITECTURE §4.1).
+        settings_row = await get_settings_row(user, db)
+        await materialize.ensure_window(user, db, settings_row)
         await db.commit()
     except IntegrityError:
         await db.rollback()
@@ -62,4 +68,9 @@ async def login(data: LoginIn, ip: str, db: AsyncSession) -> User:
     if data.tz and data.tz != user.tz:
         user.tz = data.tz
         await db.commit()
+    # Materialization runs on login too (ARCHITECTURE §4.1): refills the window
+    # after absences. Same transaction as any tz change above is not required.
+    settings_row = await get_settings_row(user, db)
+    await materialize.ensure_window(user, db, settings_row)
+    await db.commit()
     return user

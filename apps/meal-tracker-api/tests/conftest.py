@@ -7,7 +7,7 @@ os.environ.setdefault("COOKIE_SECURE", "false")
 os.environ["JWT_SECRET"] = "test-secret-32-chars-0123456789abcdef0123456789abcde"
 
 import pytest  # noqa: E402
-from sqlalchemy import delete  # noqa: E402
+from sqlalchemy import delete, select  # noqa: E402
 
 from app.core.config import settings  # noqa: E402
 from app.models import User  # noqa: E402
@@ -34,6 +34,22 @@ async def _delete_test_users() -> None:
         await session.commit()
 
 
+async def _delete_test_meals() -> None:
+    from app.core.db import SessionFactory
+    from app.models import Meal
+
+    assert SessionFactory is not None
+    async with SessionFactory() as session:
+        await session.execute(
+            delete(Meal).where(
+                Meal.user_id.in_(
+                    select(User.id).where(User.username.startswith(TEST_USERNAME_PREFIX))
+                )
+            )
+        )
+        await session.commit()
+
+
 @pytest.fixture
 def clean_db():
     if not DB_AVAILABLE:
@@ -42,3 +58,14 @@ def clean_db():
     asyncio.run(_delete_test_users())
     yield
     asyncio.run(_delete_test_users())
+
+
+@pytest.fixture
+def clean_meals(clean_db):
+    """clean_db plus explicit meal cleanup (rows cascade, but tests stay isolated)."""
+    if not DB_AVAILABLE:
+        yield
+        return
+    asyncio.run(_delete_test_meals())
+    yield
+    asyncio.run(_delete_test_meals())

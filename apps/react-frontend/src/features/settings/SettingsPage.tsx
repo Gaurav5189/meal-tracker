@@ -77,6 +77,9 @@ export default function SettingsPage() {
         lock_past_meals: values.lock_past_meals,
       });
       queryClient.setQueryData(settingsQueryKey, saved);
+      // Defaults changed: the server re-applied them to future meals (§4.2),
+      // so every cached month is stale (ARCHITECTURE §7).
+      queryClient.invalidateQueries({ queryKey: ["meals"] });
       toast("Settings saved");
     } catch (err) {
       if (err instanceof ApiError) {

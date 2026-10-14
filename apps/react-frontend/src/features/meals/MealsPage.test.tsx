@@ -37,7 +37,9 @@ const MEALS: MealsMonth = {
     {
       date: "2026-10-14",
       lunch: { id: null, taken: false, price: "35.00", price_overridden: false, locked: false },
-      dinner: { id: "d-14", taken: false, price: "35.00", price_overridden: false, locked: true },
+      // Future meals are auto-marked taken, but must not count toward the
+      // displayed total: the card sums only days up to today (2026-10-13).
+      dinner: { id: "d-14", taken: true, price: "35.00", price_overridden: false, locked: true },
     },
   ],
 };
@@ -73,9 +75,11 @@ test("renders month card, rows, and highlights today", () => {
   renderMeals(vi.fn());
 
   expect(screen.getByText(/^October/)).toBeDefined();
-  // Total (₹40) matches the one taken custom-price meal on today's row.
+  // Total (₹40) counts only meals up to today: the auto-taken future meal
+  // (lunch on 14/10, ₹35) is excluded from the month card.
   const totalCard = screen.getByText("Meal price total").parentElement;
   expect(totalCard?.textContent).toContain("₹40");
+  expect(totalCard?.textContent).not.toContain("₹75");
   expect(screen.getAllByText("₹35").length).toBeGreaterThan(0);
   expect(screen.getByText("Meals taken").parentElement?.textContent).toContain("1");
   // Today's row is highlighted via the "Today" label.

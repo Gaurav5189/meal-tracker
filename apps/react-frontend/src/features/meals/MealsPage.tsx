@@ -174,11 +174,15 @@ export default function MealsPage() {
 
   // Totals recompute from the (optimistically patched) days so the month card
   // updates instantly; the server's own total stays the source of truth on refetch.
+  // Only days up to and including today count: future meals are auto-marked
+  // taken but haven't happened yet, so they must not inflate the month total.
   const totals = useMemo(() => {
     if (!data) return { total: 0, takenCount: 0 };
+    const today = data.today || todayIso();
     let total = 0;
     let takenCount = 0;
     for (const day of data.days) {
+      if (day.date > today) break;
       for (const meal of [day.lunch, day.dinner]) {
         if (meal.taken) {
           total += Number(meal.price);

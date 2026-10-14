@@ -1,8 +1,8 @@
 # Project Index & Map
 
 ## Active State
-- **Current Phase:** Phase 8 — Hardening & Release (in progress)
-- **Current Task:** Security headers + access logging landed; final production smoke test and Azure redeploy pending
+- **Current Phase:** Complete — all phases (0–8) done; live in production
+- **Current Task:** None — maintenance/bugfix mode. Deployment: API on Azure App Service, app on Cloudflare Pages, Postgres on Neon
 
 ## Structure
 - `apps/react-frontend/` — Vite + React + TypeScript frontend

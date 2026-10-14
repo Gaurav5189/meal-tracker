@@ -73,5 +73,4 @@ async def update_settings(user: User, data: SettingsIn, db: AsyncSession) -> Use
     row.upcoming_default_on = data.upcoming_default_on
     row.lock_past_meals = data.lock_past_meals
     await db.commit()
-    await db.refresh(row)
     return row

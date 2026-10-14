@@ -13,7 +13,6 @@ async def update_name(user: User, data: NameUpdateIn, db: AsyncSession) -> User:
     if data.onboarded is not None:
         user.onboarded = data.onboarded
     await db.commit()
-    await db.refresh(user)
     return user
 
 

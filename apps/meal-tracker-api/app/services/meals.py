@@ -87,27 +87,20 @@ async def get_month(
     )
     by_key = {(row.meal_date, row.meal_type): row for row in rows}
 
-    total: Decimal = await db.scalar(
-        select(func.coalesce(func.sum(Meal.price), 0).cast(Numeric(12, 2))).where(
+    agg = await db.execute(
+        select(
+            func.coalesce(func.sum(Meal.price), 0).cast(Numeric(12, 2)).label("total"),
+            func.count().label("taken_count"),
+        ).where(
             Meal.user_id == user.id,
             Meal.meal_date >= start,
             Meal.meal_date <= end,
             Meal.taken.is_(True),
         )
-    ) or Decimal("0.00")
-    taken_count: int = (
-        await db.scalar(
-            select(func.count())
-            .select_from(Meal)
-            .where(
-                Meal.user_id == user.id,
-                Meal.meal_date >= start,
-                Meal.meal_date <= end,
-                Meal.taken.is_(True),
-            )
-        )
-        or 0
     )
+    agg_row = agg.one()
+    total: Decimal = agg_row.total or Decimal("0.00")
+    taken_count: int = agg_row.taken_count or 0
 
     days: list[MealDayOut] = []
     day = start
@@ -161,5 +154,4 @@ async def patch_meal(
             row.price = payload.price
             row.price_overridden = True
     await db.commit()
-    await db.refresh(row)
     return meal_out(row, settings_row, user.tz)
